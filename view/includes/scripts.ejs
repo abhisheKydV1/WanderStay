@@ -1,0 +1,149 @@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="/js/script.js"></script>
+
+<!-- Alert utility functions -->
+<script>
+  // Alert utility functions for showing success/error messages
+  function showAlert(message, type = 'info', duration = 5000) {
+    // Remove existing alerts
+    const existingAlerts = document.querySelectorAll('.custom-alert');
+    existingAlerts.forEach(alert => alert.remove());
+
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show custom-alert position-fixed`;
+    alertDiv.style.cssText = `
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      min-width: 300px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+
+    // Set icon based on type
+    let icon = '';
+    switch(type) {
+      case 'success':
+        icon = '<i class="fas fa-check-circle me-2"></i>';
+        break;
+      case 'error':
+      case 'danger':
+        icon = '<i class="fas fa-exclamation-triangle me-2"></i>';
+        break;
+      case 'warning':
+        icon = '<i class="fas fa-exclamation-circle me-2"></i>';
+        break;
+      case 'info':
+        icon = '<i class="fas fa-info-circle me-2"></i>';
+        break;
+    }
+
+    alertDiv.innerHTML = `
+      ${icon}${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    // Add to page
+    document.body.appendChild(alertDiv);
+
+    // Auto remove after duration
+    if (duration > 0) {
+      setTimeout(() => {
+        if (alertDiv.parentNode) {
+          alertDiv.remove();
+        }
+      }, duration);
+    }
+
+    return alertDiv;
+  }
+
+  // Convenience functions
+  function showSuccess(message, duration = 5000) {
+    return showAlert(message, 'success', duration);
+  }
+
+  function showError(message, duration = 7000) {
+    return showAlert(message, 'danger', duration);
+  }
+
+  function showWarning(message, duration = 6000) {
+    return showAlert(message, 'warning', duration);
+  }
+
+  function showInfo(message, duration = 5000) {
+    return showAlert(message, 'info', duration);
+  }
+
+  // Auto-hide alerts after 5 seconds
+  document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide server-side alerts
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+      if (!alert.classList.contains('custom-alert')) {
+        setTimeout(() => {
+          if (alert.parentNode) {
+            alert.remove();
+          }
+        }, 5000);
+      }
+    });
+  });
+</script>
+
+<style>
+/* Hide scrollbar for horizontal scrolling container */
+.destinations-container::-webkit-scrollbar {
+  display: none;
+}
+
+.destinations-container {
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Add smooth scrolling behavior */
+.destinations-wrapper {
+  scroll-behavior: smooth;
+}
+
+/* Add hover effect for destination cards */
+.destination-card:hover {
+  transform: translateY(-5px);
+  transition: transform 0.3s ease;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .destination-card {
+    width: 250px !important;
+    height: 180px !important;
+  }
+}
+</style>
+
+<script>
+// Add touch/swipe functionality for better mobile experience
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('WanderStay loaded successfully');
+
+  // Add click handlers for destination cards
+  const destinationCards = document.querySelectorAll('.destination-card');
+  destinationCards.forEach(card => {
+    card.addEventListener('click', function() {
+      const destination = this.querySelector('h5').textContent.toLowerCase().replace(' ', '');
+      // You can add navigation logic here
+      console.log('Clicked destination:', destination);
+    });
+  });
+
+  // Add scroll indicators animation
+  const scrollIndicator = document.querySelector('.destinations-container + .d-flex small');
+  if (scrollIndicator) {
+    let scrollDirection = 1;
+    setInterval(() => {
+      scrollIndicator.style.transform = `translateX(${scrollDirection * 5}px)`;
+      scrollDirection *= -1;
+    }, 1000);
+  }
+});
+</script>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include("../includes/head") %>
+  <body>
+
+    <!-- Main Content -->
+    <div class="container-fluid px-4 py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+          <!-- Page Header -->
+          <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold text-primary mb-3">
+              <i class="fas fa-edit me-3"></i>Edit Your Listing
+            </h1>
+            <p class="lead text-muted">Update your property details to attract more guests</p>
+          </div>
+
+          <!-- Edit Listing Form -->
+          <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4 p-lg-5">
+              <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" class="edit-listing-form" novalidate>
+                <!-- Title Section -->
+                <div class="mb-4">
+                  <label for="title" class="form-label fw-semibold">
+                    <i class="fas fa-heading me-2 text-primary"></i>Property Title
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control form-control-lg"
+                    id="title"
+                    name="listing[title]"
+                    placeholder="e.g., Beautiful Beach Villa in Goa"
+                    value="<%= listing.title %>"
+                    required
+                  />
+                  <div class="form-text">Choose a catchy title that highlights your property's best features</div>
+                </div>
+
+                <!-- Description Section -->
+                <div class="mb-4">
+                  <label for="description" class="form-label fw-semibold">
+                    <i class="fas fa-align-left me-2 text-primary"></i>Description
+                  </label>
+                  <textarea
+                    class="form-control"
+                    id="description"
+                    name="listing[description]"
+                    rows="4"
+                    placeholder="Describe your property, amenities, location, and what makes it special..."
+                    required
+                  ><%= listing.description %></textarea>
+                  <div class="form-text">Provide detailed information to help guests understand what to expect</div>
+                </div>
+
+                <!-- Image URL Section -->
+                <div class="mb-4">
+                  <label for="image" class="form-label fw-semibold">
+                    <i class="fas fa-image me-2 text-primary"></i>Property Image
+                  </label>
+                  <input
+                    type="url"
+                    class="form-control"
+                    id="image"
+                    name="listing[image]"
+                    placeholder="https://example.com/your-property-image.jpg"
+                    value="<%= listing.image %>"
+                    required
+                  />
+                  <div class="form-text">Provide a high-quality image URL of your property (JPG, PNG, or WebP)</div>
+                </div>
+
+                <!-- Price Section -->
+                <div class="mb-4">
+                  <label for="price" class="form-label fw-semibold">
+                    <i class="fas fa-rupee-sign me-2 text-primary"></i>Price per Night
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="price"
+                      name="listing[price]"
+                      placeholder="2500"
+                      min="1"
+                      value="<%= listing.price %>"
+                      required
+                    />
+                    <span class="input-group-text">per night</span>
+                  </div>
+                  <div class="form-text">Set a competitive price based on your location and amenities</div>
+                </div>
+
+                <!-- Location Section -->
+                <div class="row">
+                  <div class="col-md-6 mb-4">
+                    <label for="country" class="form-label fw-semibold">
+                      <i class="fas fa-globe me-2 text-primary"></i>Country
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="country"
+                      name="listing[country]"
+                      placeholder="e.g., India"
+                      value="<%= listing.country %>"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-4">
+                    <label for="location" class="form-label fw-semibold">
+                      <i class="fas fa-map-marker-alt me-2 text-primary"></i>Location
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="location"
+                      name="listing[location]"
+                      placeholder="e.g., Goa, Mumbai"
+                      value="<%= listing.location %>"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                  <a href="/listings/<%= listing._id %>" class="btn btn-outline-secondary me-md-2">
+                    <i class="fas fa-times me-2"></i>Cancel
+                  </a>
+                  <button type="submit" class="btn btn-primary btn-lg px-4">
+                    <i class="fas fa-save me-2"></i>Update Listing
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    // Edit Listing Form Validation and Enhancement
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.edit-listing-form');
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        // Form validation
+        form.addEventListener('submit', function(e) {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Show validation feedback
+                const invalidInputs = form.querySelectorAll(':invalid');
+                invalidInputs.forEach(input => {
+                    input.classList.add('is-invalid');
+                });
+
+                // Focus first invalid input
+                if (invalidInputs.length > 0) {
+                    invalidInputs[0].focus();
+                }
+            } else {
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+            }
+            form.classList.add('was-validated');
+        });
+
+        // Real-time validation feedback
+        const inputs = form.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid') && this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+        });
+
+        // Character counters for text areas
+        const textareas = form.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            const maxLength = textarea.getAttribute('maxlength') || 1000;
+            const counter = document.createElement('div');
+            counter.className = 'form-text text-end';
+            counter.innerHTML = `<small>${textarea.value.length}/${maxLength} characters</small>`;
+            textarea.parentNode.appendChild(counter);
+
+            textarea.addEventListener('input', function() {
+                counter.innerHTML = `<small>${this.value.length}/${maxLength} characters</small>`;
+                if (this.value.length > maxLength * 0.9) {
+                    counter.classList.add('text-warning');
+                } else {
+                    counter.classList.remove('text-warning');
+                }
+            });
+        });
+
+        // Price formatting
+        const priceInput = document.getElementById('price');
+        priceInput.addEventListener('input', function() {
+            let value = this.value.replace(/[^0-9]/g, '');
+            if (value) {
+                this.value = value;
+            }
+        });
+
+        // Image URL validation
+        const imageInput = document.getElementById('image');
+        imageInput.addEventListener('blur', function() {
+            if (this.value && !this.checkValidity()) {
+                this.classList.add('is-invalid');
+            }
+        });
+
+        // Auto-capitalize first letter of title
+        const titleInput = document.getElementById('title');
+        titleInput.addEventListener('input', function() {
+            if (this.value.length === 1) {
+                this.value = this.value.toUpperCase();
+            }
+        });
+
+        // Location autocomplete suggestions (basic)
+        const locationInput = document.getElementById('location');
+        const countryInput = document.getElementById('country');
+
+        // Add visual feedback for form completion
+        function updateProgress() {
+            const requiredInputs = form.querySelectorAll('[required]');
+            const filledInputs = Array.from(requiredInputs).filter(input => input.value.trim() !== '');
+            const progress = (filledInputs.length / requiredInputs.length) * 100;
+
+            // Update submit button based on completion
+            if (progress === 100) {
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-primary');
+            } else {
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-primary');
+            }
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', updateProgress);
+        });
+
+        // Initialize progress
+        updateProgress();
+    });
+    </script>
+  </body>
+</html>
