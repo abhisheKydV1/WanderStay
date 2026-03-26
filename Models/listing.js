@@ -42,6 +42,10 @@ const listingSchema = new Schema({
     required: [true, "Country is required"],
     trim: true,
   },
+  reviews: [{
+    type: Schema.Types.ObjectId,
+    ref: "Review",
+  }],
 }, {
   timestamps: true,
 });

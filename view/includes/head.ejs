@@ -5,4 +5,116 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- CLIENT-SIDE COOKIE EXAMPLES -->
+    <script>
+        // 1. THEME SWITCHER
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme); // Also store in localStorage for immediate access
+            
+            // Send to server to save in cookie
+            fetch('/api/preferences', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ theme })
+            });
+        }
+
+        // Load theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+        });
+
+        // 2. RECENTLY VIEWED LISTINGS SIDEBAR
+        async function loadRecentListings() {
+            try {
+                const response = await fetch('/api/recent-listings');
+                const data = await response.json();
+                
+                const sidebar = document.getElementById('recent-listings-sidebar');
+                if (sidebar && data.listings.length > 0) {
+                    sidebar.innerHTML = '<h5>Recently Viewed</h5>' + 
+                        data.listings.map(listing => `
+                            <div class="recent-item">
+                                <img src="${listing.image}" alt="${listing.title}" style="width: 50px; height: 50px;">
+                                <div>
+                                    <small>${listing.title}</small><br>
+                                    <small class="text-muted">${listing.location}</small>
+                                </div>
+                            </div>
+                        `).join('');
+                }
+            } catch (error) {
+                console.log('Could not load recent listings');
+            }
+        }
+
+        // 3. WISHLIST FUNCTIONALITY
+        async function toggleWishlist(listingId, buttonElement) {
+            try {
+                const isInWishlist = buttonElement.classList.contains('active');
+                const endpoint = isInWishlist ? `/api/wishlist/remove/${listingId}` : `/api/wishlist/add/${listingId}`;
+                
+                const response = await fetch(endpoint, { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    buttonElement.classList.toggle('active');
+                    buttonElement.innerHTML = isInWishlist ? 
+                        '<i class="far fa-heart"></i>' : 
+                        '<i class="fas fa-heart text-danger"></i>';
+                }
+            } catch (error) {
+                console.error('Wishlist error:', error);
+            }
+        }
+
+        // 4. SEARCH PREFERENCES
+        function saveSearchPreferences() {
+            const sortBy = document.getElementById('sort-select').value;
+            const priceRange = document.getElementById('price-range').value;
+            
+            fetch('/api/search-preferences', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sortBy, priceRange })
+            });
+        }
+
+        // 5. LOCATION DETECTION
+        function detectLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    
+                    // You could use a geocoding service here to get city/country
+                    // For demo, we'll just save coordinates
+                    await fetch('/api/location-preference', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ latitude, longitude })
+                    });
+                });
+            }
+        }
+
+        // 6. ANALYTICS TRACKING
+        async function trackPageView() {
+            try {
+                const response = await fetch('/api/analytics');
+                const data = await response.json();
+                console.log('Page views:', data.pageViews);
+            } catch (error) {
+                console.log('Analytics tracking failed');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRecentListings();
+            trackPageView();
+        });
+    </script>
 </head>
