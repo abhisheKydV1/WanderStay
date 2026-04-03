@@ -1187,3 +1187,20 @@ html {
     border: 2px solid white;
     border-radius: 50%;
 }
+
+/* Footer Styles - Hybrid Migration (External CSS with inline fallbacks) */
+.footer-logo-main {
+    height: 45px;
+    width: auto;
+}
+
+.footer-logo-bottom {
+    height: 24px;
+    width: auto;
+    margin-right: 10px;
+    filter: brightness(0) invert(1);
+}
+
+.footer-payment-method {
+    height: 20px;
+}
