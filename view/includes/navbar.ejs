@@ -2,18 +2,18 @@
   <div class="container-fluid px-3 px-lg-4">
     <!-- Logo -->
     <a class="navbar-brand" href="/">
-      <img src="/images/wanderStay_logo.png" alt="WanderStay" style="height: 32px;">
+      <img src="/images/wanderStay_logo.png" alt="WanderStay" class="navbar-logo" style="height: 32px;">
     </a>
 
     <!-- Desktop Search Bar -->
-    <div class="d-none d-lg-block flex-grow-1 mx-4" style="max-width: 600px;">
+    <div class="d-none d-lg-block flex-grow-1 mx-4 navbar-search-container" style="max-width: 600px;">
       <form action="/search" method="GET" class="search-form">
         <div class="input-group">
           <span class="input-group-text bg-white border-end-0">
             <i class="fas fa-search text-muted"></i>
           </span>
           <input type="text" name="location" class="form-control border-start-0 border-end-0" placeholder="Where are you going?" required>
-          <button class="btn btn-primary" type="submit" style="background-color: #1ba0d7; border: none; border-radius: 0 8px 8px 0;">
+          <button class="btn btn-primary navbar-search-btn" type="submit" style="background-color: #1ba0d7; border: none; border-radius: 0 8px 8px 0;">
             <i class="fas fa-search"></i>
           </button>
         </div>
@@ -31,9 +31,9 @@
       <div class="dropdown">
         <button class="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
           <i class="fas fa-bars me-2"></i>
-          <div class="rounded-circle d-flex align-items-center justify-content-center position-relative overflow-hidden" style="width: 36px; height: 36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
+          <div class="rounded-circle d-flex align-items-center justify-content-center position-relative overflow-hidden navbar-avatar" style="width: 36px; height: 36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
             <i class="fas fa-user text-white" style="font-size: 16px;"></i>
-            <div class="position-absolute" style="bottom: -2px; right: -2px; width: 12px; height: 12px; background: #1ba0d7; border-radius: 50%; border: 2px solid white;"></div>
+            <div class="position-absolute navbar-online-indicator" style="bottom: -2px; right: -2px; width: 12px; height: 12px; background: #1ba0d7; border-radius: 50%; border: 2px solid white;"></div>
           </div>
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
@@ -65,7 +65,7 @@
             <i class="fas fa-search text-muted"></i>
           </span>
           <input type="text" name="location" class="form-control" placeholder="Where are you going?" required>
-          <button class="btn btn-primary" type="submit" style="background-color: #1ba0d7; border: none;">
+          <button class="btn btn-primary navbar-search-btn" type="submit" style="background-color: #1ba0d7; border: none;">
             Search
           </button>
         </div>
