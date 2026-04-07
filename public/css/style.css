@@ -77,26 +77,46 @@ body {
     }
 }
 
-/* Agoda-style Enhancements */
-.hero-section {
-    background-attachment: fixed;
-    background-size: cover;
+/* Mapbox Map Styles */
+.map-container {
     position: relative;
 }
 
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
+.amenity-marker {
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.hero-section .container {
-    position: relative;
-    z-index: 2;
+.amenity-marker:hover {
+    transform: scale(1.1);
+}
+
+.amenity-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.map-legend {
+    border: 1px solid #e9ecef;
+}
+
+.map-info {
+    font-size: 12px;
+}
+
+/* Mapbox popup customization */
+.mapboxgl-popup-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.mapboxgl-popup-tip {
+    border-width: 8px;
 }
 
 .destination-card {
