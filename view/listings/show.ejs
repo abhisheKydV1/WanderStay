@@ -118,36 +118,47 @@
       <!-- Amenities -->
       <div class="property-amenities mb-4">
         <h3 class="h4 fw-bold mb-3">Amenities</h3>
+        <% if (listing.amenities && listing.amenities.length > 0) { %>
         <div class="row g-3">
           <div class="col-md-6">
-            <div class="d-flex align-items-center mb-2">
-              <i class="fas fa-wifi text-primary me-3"></i>
-              <span>Free WiFi</span>
-            </div>
-            <div class="d-flex align-items-center mb-2">
-              <i class="fas fa-swimming-pool text-primary me-3"></i>
-              <span>Swimming Pool</span>
-            </div>
-            <div class="d-flex align-items-center mb-2">
-              <i class="fas fa-car text-primary me-3"></i>
-              <span>Free Parking</span>
-            </div>
+            <% listing.amenities.forEach(amenity => { %>
+              <% if (['wifi', 'pool', 'parking', 'kitchen', 'ac', 'gym'].includes(amenity)) { %>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fas fa-<%= 
+                    amenity === 'wifi' ? 'wifi' : 
+                    amenity === 'pool' ? 'swimming-pool' : 
+                    amenity === 'parking' ? 'car' : 
+                    amenity === 'kitchen' ? 'utensils' : 
+                    amenity === 'ac' ? 'snowflake' : 
+                    amenity === 'gym' ? 'dumbbell' : 'check'
+                  %> text-primary me-3"></i>
+                  <span><%= 
+                    amenity === 'wifi' ? 'Free WiFi' : 
+                    amenity === 'pool' ? 'Swimming Pool' : 
+                    amenity === 'parking' ? 'Free Parking' : 
+                    amenity === 'kitchen' ? 'Fully Equipped Kitchen' : 
+                    amenity === 'ac' ? 'Air Conditioning' : 
+                    amenity === 'gym' ? 'Gym/Fitness Center' : 
+                    amenity.charAt(0).toUpperCase() + amenity.slice(1)
+                  %></span>
+                </div>
+              <% } %>
+            <% }); %>
           </div>
           <div class="col-md-6">
-            <div class="d-flex align-items-center mb-2">
-              <i class="fas fa-utensils text-primary me-3"></i>
-              <span>Kitchen</span>
-            </div>
-            <div class="d-flex align-items-center mb-2">
-              <i class="fas fa-tv text-primary me-3"></i>
-              <span>TV</span>
-            </div>
-            <div class="d-flex align-items-center mb-2">
-              <i class="fas fa-snowflake text-primary me-3"></i>
-              <span>Air Conditioning</span>
-            </div>
+            <% listing.amenities.forEach(amenity => { %>
+              <% if (!['wifi', 'pool', 'parking', 'kitchen', 'ac', 'gym'].includes(amenity)) { %>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fas fa-check text-primary me-3"></i>
+                  <span><%= amenity.charAt(0).toUpperCase() + amenity.slice(1) %></span>
+                </div>
+              <% } %>
+            <% }); %>
           </div>
         </div>
+        <% } else { %>
+        <p class="text-muted">No amenities information available.</p>
+        <% } %>
       </div>
 
       <!-- Location/Map Section -->
