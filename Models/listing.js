@@ -46,6 +46,17 @@ const listingSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Review",
   }],
+  geometry: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
+  },
 }, {
   timestamps: true,
 });
@@ -77,6 +88,10 @@ const listingJoiSchema = Joi.object({
   country: Joi.string().required().messages({
     'string.empty': 'Country is required',
   }),
+  geometry: Joi.object({
+    type: Joi.string().valid('Point').required(),
+    coordinates: Joi.array().items(Joi.number()).length(2).required()
+  }).required(),
 });
 
 const Listing = mongoose.model("Listing", listingSchema);
