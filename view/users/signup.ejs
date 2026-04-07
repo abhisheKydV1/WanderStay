@@ -9,22 +9,6 @@
           </h3>
         </div>
         <div class="card-body p-4">
-          <!-- Flash Messages -->
-          <% if (locals.error && locals.error.length > 0) { %>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              <i class="fas fa-exclamation-triangle me-2"></i>
-              <%= locals.error %>
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-          <% } %>
-          <% if (locals.success && locals.success.length > 0) { %>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-              <i class="fas fa-check-circle me-2"></i>
-              <%= locals.success %>
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-          <% } %>
-
           <form action="/signup" method="POST" id="signupForm">
             <div class="mb-3">
               <label for="username" class="form-label fw-semibold">

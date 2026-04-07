@@ -13,39 +13,10 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
-const multer = require("multer");
 const asyncWrap = require("./public/utilities/asyncWrap");
 const { AppError, ValidationError, AuthenticationError, AuthorizationError, NotFoundError, DatabaseError } = require("./public/utilities/CustomError");
 
-// Load environment variables
-require("dotenv").config();
-
-const MONGO_URL = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/wanderstay";
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/uploads/');
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
-const upload = multer({ 
-    storage: storage,
-    limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
-    },
-    fileFilter: function (req, file, cb) {
-        if (file.mimetype.startsWith('image/')) {
-            cb(null, true);
-        } else {
-            cb(new Error('Only image files are allowed!'), false);
-        }
-    }
-});
+const MONGO_URL = "mongodb://127.0.0.1:27017/wanderstay";
 
 main()
   .then(() => {
@@ -90,7 +61,6 @@ app.use(flash());
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
-  res.locals.mapboxToken = process.env.MAPBOX_ACCESS_TOKEN;
   next();
 });
 
@@ -133,12 +103,7 @@ app.post("/signup", asyncWrap(async (req, res) => {
             req.flash('error', 'Username or email already exists'); // FLASH MESSAGE
             return res.redirect("/signup");
         }
-        
-        // Hash password manually
-        const bcrypt = require('bcryptjs');
-        const hashedPassword = await bcrypt.hash(password, 12);
-        
-        const newUser = new User({ email, username, password: hashedPassword });
+        const newUser = new User({ email, username, password });
         await newUser.save();
         req.session.userId = newUser._id;
         req.flash('success', `Welcome to WanderStay, ${username}!`); // FLASH MESSAGE
@@ -188,13 +153,13 @@ app.get("/help", (req, res) => {
 
 
 app.get("/", asyncWrap(async (req, res) => {
-  const allListings = await Listing.find({}).sort({createdAt: -1}).limit(12);
+  const allListings = await Listing.find({});
   res.render("listings/index", { allListings, layout: 'boilerplate' });
 }));
 
 //Index Route
 app.get("/listings", asyncWrap(async (req, res) => {
-  const allListings = await Listing.find({}).sort({createdAt: -1}).limit(12);
+  const allListings = await Listing.find({});
   res.render("listings/index", { allListings, layout: 'boilerplate' });
 }));
 
@@ -219,7 +184,7 @@ app.get("/search", asyncWrap(async (req, res) => {
 
 //New Route
 app.get("/listings/new", isLoggedIn, (req, res) => {
-  res.render("listings/new", { listing: {}, errors: {} });
+  res.render("listings/new");
 });
 
 //Show Route
@@ -501,23 +466,12 @@ app.get("/api/auth-status", (req, res) => {
 });
 
 //Create Route
-app.post("/listings", isLoggedIn, upload.single('image'), asyncWrap(async (req, res) => {
+app.post("/listings", isLoggedIn, asyncWrap(async (req, res) => {
   try {
+    // Normalize incoming image field to match schema (image.url)
     const data = req.body.listing || {};
-
-    // Handle image upload or URL
-    if (req.file) {
-      // File was uploaded
-      data.image = {
-        url: `/uploads/${req.file.filename}`,
-        filename: req.file.filename
-      };
-    } else if (data.image && typeof data.image === 'string') {
-      // URL was provided
+    if (data.image && typeof data.image === 'string') {
       data.image = { url: data.image };
-    } else {
-      // No image provided
-      data.image = { url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60' };
     }
 
     const newListing = new Listing(data);
