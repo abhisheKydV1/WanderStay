@@ -25,7 +25,7 @@
               <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
                 <div class="alert alert-danger" role="alert"><%= errorMessage %></div>
               <% } %>
-              <form method="POST" action="/listings" class="add-listing-form" novalidate>
+              <form method="POST" action="/listings" enctype="multipart/form-data" class="add-listing-form" novalidate>
                 <!-- Title Section -->
                 <div class="mb-4">
                   <label for="title" class="form-label fw-semibold">
@@ -70,28 +70,50 @@
                   <label for="image" class="form-label fw-semibold">
                     <i class="fas fa-image me-2 text-primary"></i>Property Image
                   </label>
-                  <input
-                    type="url"
-                    class="form-control <%= (errors && (errors['image.url'] || errors['image'])) ? 'is-invalid' : '' %>"
-                    id="image"
-                    name="listing[image]"
-                    placeholder="https://example.com/your-property-image.jpg"
-                    required
-                    value="<%=
-                      (function(){
-                        if (!listing) return '';
-                        if (typeof listing.image === 'string') return listing.image;
-                        if (listing.image && listing.image.url) return listing.image.url;
-                        return '';
-                      })()
-                    %>"
-                  />
-                  <% if (errors && errors['image.url']) { %>
-                    <div class="invalid-feedback"><%= errors['image.url'].message %></div>
-                  <% } else if (errors && errors['image']) { %>
-                    <div class="invalid-feedback"><%= errors['image'].message %></div>
-                  <% } %>
-                  <div class="form-text">Provide a high-quality image URL of your property (JPG, PNG, or WebP)</div>
+
+                  <!-- Image Upload Option -->
+                  <div class="mb-3">
+                    <label class="form-label text-muted small">Upload from device:</label>
+                    <input
+                      type="file"
+                      class="form-control"
+                      id="imageFile"
+                      name="image"
+                      accept="image/*"
+                    />
+                    <div class="form-text">Select an image file from your device (max 5MB)</div>
+                  </div>
+
+                  <!-- OR Separator -->
+                  <div class="text-center mb-3">
+                    <span class="badge bg-light text-muted">OR</span>
+                  </div>
+
+                  <!-- URL Option -->
+                  <div>
+                    <label class="form-label text-muted small">Enter image URL:</label>
+                    <input
+                      type="url"
+                      class="form-control <%= (errors && (errors['image.url'] || errors['image'])) ? 'is-invalid' : '' %>"
+                      id="imageUrl"
+                      name="listing[image]"
+                      placeholder="https://example.com/your-property-image.jpg"
+                      value="<%=
+                        (function(){
+                          if (!listing) return '';
+                          if (typeof listing.image === 'string') return listing.image;
+                          if (listing.image && listing.image.url && !listing.image.url.startsWith('/uploads/')) return listing.image.url;
+                          return '';
+                        })()
+                      %>"
+                    />
+                    <% if (errors && errors['image.url']) { %>
+                      <div class="invalid-feedback"><%= errors['image.url'].message %></div>
+                    <% } else if (errors && errors['image']) { %>
+                      <div class="invalid-feedback"><%= errors['image'].message %></div>
+                    <% } %>
+                    <div class="form-text">Provide a direct link to an image on the web</div>
+                  </div>
                 </div>
 
                 <!-- Price Section -->
@@ -246,6 +268,20 @@
             field.classList.remove('is-valid', 'is-invalid');
 
             switch(field.name) {
+                case 'image':
+                    // File upload validation
+                    if (field.files && field.files.length > 0) {
+                        const file = field.files[0];
+                        if (!file.type.startsWith('image/')) {
+                            isValid = false;
+                            message = 'Please select a valid image file';
+                        } else if (file.size > 5 * 1024 * 1024) { // 5MB
+                            isValid = false;
+                            message = 'File size must be less than 5MB';
+                        }
+                    }
+                    break;
+
                 case 'listing[title]':
                     if (!value) {
                         isValid = false;
@@ -273,16 +309,22 @@
                     break;
 
                 case 'listing[image]':
-                    if (!value) {
+                    // Check if either file is uploaded or URL is provided
+                    const fileInput = document.getElementById('imageFile');
+                    const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+                    const hasUrl = value && value.trim() !== '';
+
+                    if (!hasFile && !hasUrl) {
                         isValid = false;
-                        message = 'Image URL is required';
-                    } else {
+                        message = 'Please either upload an image file or provide an image URL';
+                    } else if (hasUrl && !hasFile) {
+                        // Validate URL format
                         try {
                             new URL(value);
-                            // Check if it's a valid image URL
-                            if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(value)) {
+                            // Check if it's a valid image URL (basic check)
+                            if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(value) && !value.includes('unsplash.com')) {
                                 isValid = false;
-                                message = 'Please provide a valid image URL (jpg, png, gif, or webp)';
+                                message = 'Please provide a valid image URL';
                             }
                         } catch {
                             isValid = false;
@@ -398,11 +440,11 @@
         // Form field focus effects
         inputs.forEach(input => {
             input.addEventListener('focus', function() {
-                this.parentNode.querySelector('.form-label').style.color = '#667eea';
+                this.parentNode.querySelector('.form-label').classList.add('form-label-focus');
             });
 
             input.addEventListener('blur', function() {
-                this.parentNode.querySelector('.form-label').style.color = '';
+                this.parentNode.querySelector('.form-label').classList.remove('form-label-focus');
             });
         });
     });
