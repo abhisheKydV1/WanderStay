@@ -19,15 +19,6 @@
     // Add navigation controls
     map.addControl(new mapboxgl.NavigationControl());
 
-    // Add geolocate control
-    map.addControl(new mapboxgl.GeolocateControl({
-      positionOptions: {
-        enableHighAccuracy: true
-      },
-      trackUserLocation: true,
-      showUserHeading: true
-    }));
-
     // Add marker for the listing location
     const marker = new mapboxgl.Marker({ color: '#1ba0d7' })
       .setLngLat(window.mapData.coordinates)
@@ -65,10 +56,8 @@
     const amenityTypes = [
       { type: 'restaurant', icon: 'restaurant', color: '#ff6b6b' },
       { type: 'cafe', icon: 'cafe', color: '#4ecdc4' },
-      { type: 'bar', icon: 'bar', color: '#45b7d1' },
       { type: 'supermarket', icon: 'grocery', color: '#96ceb4' },
-      { type: 'pharmacy', icon: 'hospital', color: '#feca57' },
-      { type: 'bank', icon: 'bank', color: '#ff9ff3' }
+      { type: 'pharmacy', icon: 'hospital', color: '#feca57' }
     ];
 
     for (const amenity of amenityTypes) {
