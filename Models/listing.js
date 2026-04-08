@@ -42,6 +42,11 @@ const listingSchema = new Schema({
     required: [true, "Country is required"],
     trim: true,
   },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   reviews: [{
     type: Schema.Types.ObjectId,
     ref: "Review",
@@ -50,11 +55,11 @@ const listingSchema = new Schema({
     type: {
       type: String,
       enum: ['Point'],
-      required: true
+      // required: true
     },
     coordinates: {
       type: [Number],
-      required: true
+      // required: true
     }
   },
 }, {
@@ -88,10 +93,11 @@ const listingJoiSchema = Joi.object({
   country: Joi.string().required().messages({
     'string.empty': 'Country is required',
   }),
+  owner: Joi.string().required(), // ObjectId as string
   geometry: Joi.object({
-    type: Joi.string().valid('Point').required(),
-    coordinates: Joi.array().items(Joi.number()).length(2).required()
-  }).required(),
+    type: Joi.string().valid('Point'), // .required()
+    coordinates: Joi.array().items(Joi.number()).length(2) // .required()
+  }) // .required(),
 });
 
 const Listing = mongoose.model("Listing", listingSchema);

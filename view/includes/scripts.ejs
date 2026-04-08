@@ -4,8 +4,8 @@
 
 <!-- Mapbox initialization -->
 <script>
-  // Initialize Mapbox map if data is available
-  if (window.mapData && window.mapData.token) {
+  // Initialize Mapbox map if data is available and map element exists
+  if (window.mapData && window.mapData.token && document.getElementById('map')) {
     console.log('Initializing Mapbox map...');
     mapboxgl.accessToken = window.mapData.token;
 
@@ -43,9 +43,10 @@
     });
 
     console.log('Map initialized successfully');
-  } else {
-    console.log('Map data not available');
+  } else if (document.getElementById('map')) {
+    console.log('Map element found but no map data available');
   }
+
 
   // Function to add nearby amenities
   async function addNearbyAmenities(map, coordinates) {

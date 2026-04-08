@@ -3,409 +3,138 @@
   <%- include("../includes/head") %>
   <body>
 
-    <!-- Main Content -->
     <div class="container-fluid px-4 py-5">
       <div class="row justify-content-center">
         <div class="col-lg-8 col-xl-6">
-          <!-- Page Header -->
+
+          <!-- Header -->
           <div class="text-center mb-5">
             <h1 class="display-5 fw-bold text-primary mb-3">
               <i class="fas fa-plus-circle me-3"></i>Add New Listing
             </h1>
-            <p class="lead text-muted">Share your property with travelers worldwide and start earning</p>
+            <p class="lead text-muted">
+              Share your property with travelers worldwide and start earning
+            </p>
           </div>
 
-          <!-- Add Listing Form -->
+          <!-- Card -->
           <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-4 p-lg-5">
-              <!-- Flash messages -->
-              <% if (typeof successMessage !== 'undefined' && successMessage) { %>
-                <div class="alert alert-success" role="alert"><%= successMessage %></div>
+
+              <!-- Flash Messages -->
+              <% if (locals.successMessage && locals.successMessage.length > 0) { %>
+                <div class="alert alert-success"><%= locals.successMessage %></div>
               <% } %>
-              <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
-                <div class="alert alert-danger" role="alert"><%= errorMessage %></div>
+
+              <% if (locals.errorMessage && locals.errorMessage.length > 0) { %>
+                <div class="alert alert-danger"><%= locals.errorMessage %></div>
               <% } %>
-              <form method="POST" action="/listings" class="add-listing-form" novalidate>
-                <!-- Title Section -->
+
+              <!-- FORM -->
+              <form method="POST" action="/listings" enctype="multipart/form-data">
+
+                <!-- Title -->
                 <div class="mb-4">
-                  <label for="title" class="form-label fw-semibold">
-                    <i class="fas fa-heading me-2 text-primary"></i>Property Title
-                  </label>
-                  <input
+                  <label class="form-label fw-semibold">Property Title</label>
+                  <input 
                     type="text"
-                    class="form-control form-control-lg <%= errors && errors.title ? 'is-invalid' : '' %>"
-                    id="title"
                     name="listing[title]"
-                    placeholder="e.g., Beautiful Beach Villa in Goa"
+                    class="form-control <%= locals.errors?.title ? 'is-invalid' : '' %>"
+                    value="<%= listing?.title || '' %>"
                     required
-                    value="<%= listing && listing.title ? listing.title : '' %>"
-                  />
-                  <% if (errors && errors.title) { %>
+                  >
+                  <% if (locals.errors?.title) { %>
                     <div class="invalid-feedback"><%= errors.title.message %></div>
                   <% } %>
-                  <div class="form-text">Choose a catchy title that highlights your property's best features</div>
                 </div>
 
-                <!-- Description Section -->
+                <!-- Description -->
                 <div class="mb-4">
-                  <label for="description" class="form-label fw-semibold">
-                    <i class="fas fa-align-left me-2 text-primary"></i>Description
-                  </label>
-                  <textarea
-                    class="form-control <%= errors && errors.description ? 'is-invalid' : '' %>"
-                    id="description"
+                  <label class="form-label fw-semibold">Description</label>
+                  <textarea 
                     name="listing[description]"
+                    class="form-control <%= locals.errors?.description ? 'is-invalid' : '' %>"
                     rows="4"
-                    placeholder="Describe your property, amenities, location, and what makes it special..."
                     required
-                  ><%= listing && listing.description ? listing.description : '' %></textarea>
-                  <% if (errors && errors.description) { %>
+                  ><%= listing?.description || '' %></textarea>
+                  <% if (locals.errors?.description) { %>
                     <div class="invalid-feedback"><%= errors.description.message %></div>
                   <% } %>
-                  <div class="form-text">Provide detailed information to help guests understand what to expect</div>
                 </div>
 
-                <!-- Image URL Section -->
+                <!-- Image Upload -->
                 <div class="mb-4">
-                  <label for="image" class="form-label fw-semibold">
-                    <i class="fas fa-image me-2 text-primary"></i>Property Image
-                  </label>
-                  <input
-                    type="url"
-                    class="form-control <%= (errors && (errors['image.url'] || errors['image'])) ? 'is-invalid' : '' %>"
-                    id="image"
-                    name="listing[image]"
-                    placeholder="https://example.com/your-property-image.jpg"
+                  <label class="form-label fw-semibold">Upload Image</label>
+                  <input 
+                    type="file"
+                    name="image"
+                    class="form-control <%= locals.errors?.image ? 'is-invalid' : '' %>"
+                    accept="image/*"
                     required
-                    value="<%=
-                      (function(){
-                        if (!listing) return '';
-                        if (typeof listing.image === 'string') return listing.image;
-                        if (listing.image && listing.image.url) return listing.image.url;
-                        return '';
-                      })()
-                    %>"
-                  />
-                  <% if (errors && errors['image.url']) { %>
-                    <div class="invalid-feedback"><%= errors['image.url'].message %></div>
-                  <% } else if (errors && errors['image']) { %>
-                    <div class="invalid-feedback"><%= errors['image'].message %></div>
+                  >
+                  <% if (locals.errors?.image) { %>
+                    <div class="invalid-feedback">Image is required</div>
                   <% } %>
-                  <div class="form-text">Provide a high-quality image URL of your property (JPG, PNG, or WebP)</div>
                 </div>
 
-                <!-- Price Section -->
+                <!-- Price -->
                 <div class="mb-4">
-                  <label for="price" class="form-label fw-semibold">
-                    <i class="fas fa-rupee-sign me-2 text-primary"></i>Price per Night
-                  </label>
-                  <div class="input-group">
-                    <span class="input-group-text">₹</span>
-                    <input
-                      type="number"
-                      class="form-control <%= errors && errors.price ? 'is-invalid' : '' %>"
-                      id="price"
-                      name="listing[price]"
-                      placeholder="2500"
-                      min="1"
-                      required
-                      value="<%= listing && listing.price ? listing.price : '' %>"
-                    />
-                    <% if (errors && errors.price) { %>
-                      <div class="invalid-feedback"><%= errors.price.message %></div>
-                    <% } %>
-                    <span class="input-group-text">per night</span>
-                  </div>
-                  <div class="form-text">Set a competitive price based on your location and amenities</div>
+                  <label class="form-label fw-semibold">Price (₹ per night)</label>
+                  <input 
+                    type="number"
+                    name="listing[price]"
+                    class="form-control <%= locals.errors?.price ? 'is-invalid' : '' %>"
+                    value="<%= listing?.price || '' %>"
+                    required
+                  >
+                  <% if (locals.errors?.price) { %>
+                    <div class="invalid-feedback"><%= errors.price.message %></div>
+                  <% } %>
                 </div>
 
-                <!-- Location Section -->
-                <div class="row">
-                  <div class="col-md-6 mb-4">
-                    <label for="country" class="form-label fw-semibold">
-                      <i class="fas fa-globe me-2 text-primary"></i>Country
-                    </label>
-                    <input
-                      type="text"
-                      class="form-control <%= errors && errors.country ? 'is-invalid' : '' %>"
-                      id="country"
-                      name="listing[country]"
-                      placeholder="India"
-                      required
-                      value="<%= listing && listing.country ? listing.country : '' %>"
-                    />
-                    <% if (errors && errors.country) { %>
-                      <div class="invalid-feedback"><%= errors.country.message %></div>
-                    <% } %>
-                  </div>
-                  <div class="col-md-6 mb-4">
-                    <label for="location" class="form-label fw-semibold">
-                      <i class="fas fa-map-marker-alt me-2 text-primary"></i>City/Location
-                    </label>
-                    <input
-                      type="text"
-                      class="form-control <%= errors && errors.location ? 'is-invalid' : '' %>"
-                      id="location"
-                      name="listing[location]"
-                      placeholder="Goa, Mumbai, Delhi..."
-                      required
-                      value="<%= listing && listing.location ? listing.location : '' %>"
-                    />
-                    <% if (errors && errors.location) { %>
-                      <div class="invalid-feedback"><%= errors.location.message %></div>
-                    <% } %>
-                  </div>
+                <!-- Country -->
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">Country</label>
+                  <input 
+                    type="text"
+                    name="listing[country]"
+                    class="form-control <%= locals.errors?.country ? 'is-invalid' : '' %>"
+                    value="<%= listing?.country || '' %>"
+                    required
+                  >
+                  <% if (locals.errors?.country) { %>
+                    <div class="invalid-feedback"><%= errors.country.message %></div>
+                  <% } %>
                 </div>
 
-                <!-- Submit Button -->
-                <div class="d-grid gap-2 mt-5">
-                  <button type="submit" class="btn btn-primary btn-lg rounded-pill">
-                    <i class="fas fa-plus me-2"></i>Add Listing
-                  </button>
-                  <a href="/listings" class="btn btn-outline-secondary rounded-pill">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Listings
-                  </a>
+                <!-- Location -->
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">Location</label>
+                  <input 
+                    type="text"
+                    name="listing[location]"
+                    class="form-control <%= locals.errors?.location ? 'is-invalid' : '' %>"
+                    value="<%= listing?.location || '' %>"
+                    required
+                  >
+                  <% if (locals.errors?.location) { %>
+                    <div class="invalid-feedback"><%= errors.location.message %></div>
+                  <% } %>
                 </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="fas fa-plus me-2"></i>Add Listing
+                </button>
+
               </form>
+
             </div>
           </div>
 
-          <!-- Tips Section -->
-          <div class="mt-5">
-            <div class="card border-info">
-              <div class="card-body">
-                <h5 class="card-title text-info">
-                  <i class="fas fa-lightbulb me-2"></i>Tips for a Great Listing
-                </h5>
-                <ul class="mb-0 small">
-                  <li>Use high-quality, well-lit photos that show all angles of your property</li>
-                  <li>Be specific about amenities, rules, and what guests can expect</li>
-                  <li>Set competitive prices based on similar properties in your area</li>
-                  <li>Respond quickly to inquiries to build trust with potential guests</li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
 
-    <script>
-    // Add Listing Form Validation and Enhancement
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('.add-listing-form');
-        const submitBtn = form.querySelector('.btn-primary');
-
-        // Real-time validation feedback
-        const inputs = form.querySelectorAll('input, textarea');
-        inputs.forEach(input => {
-            input.addEventListener('blur', function() {
-                validateField(this);
-            });
-
-            input.addEventListener('input', function() {
-                if (this.classList.contains('is-invalid')) {
-                    validateField(this);
-                }
-            });
-        });
-
-        // Form submission handler
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
-
-            // Validate all fields
-            inputs.forEach(input => {
-                if (!validateField(input)) {
-                    isValid = false;
-                }
-            });
-
-            if (!isValid) {
-                e.preventDefault();
-                // Scroll to first invalid field
-                const firstInvalid = form.querySelector('.is-invalid');
-                if (firstInvalid) {
-                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    firstInvalid.focus();
-                }
-                return false;
-            }
-
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding Listing...';
-        });
-
-        function validateField(field) {
-            const value = field.value.trim();
-            let isValid = true;
-            let message = '';
-
-            // Remove existing validation classes
-            field.classList.remove('is-valid', 'is-invalid');
-
-            switch(field.name) {
-                case 'listing[title]':
-                    if (!value) {
-                        isValid = false;
-                        message = 'Property title is required';
-                    } else if (value.length < 5) {
-                        isValid = false;
-                        message = 'Title must be at least 5 characters long';
-                    } else if (value.length > 100) {
-                        isValid = false;
-                        message = 'Title must be less than 100 characters';
-                    }
-                    break;
-
-                case 'listing[description]':
-                    if (!value) {
-                        isValid = false;
-                        message = 'Description is required';
-                    } else if (value.length < 20) {
-                        isValid = false;
-                        message = 'Description must be at least 20 characters long';
-                    } else if (value.length > 1000) {
-                        isValid = false;
-                        message = 'Description must be less than 1000 characters';
-                    }
-                    break;
-
-                case 'listing[image]':
-                    if (!value) {
-                        isValid = false;
-                        message = 'Image URL is required';
-                    } else {
-                        try {
-                            new URL(value);
-                            // Check if it's a valid image URL
-                            if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(value)) {
-                                isValid = false;
-                                message = 'Please provide a valid image URL (jpg, png, gif, or webp)';
-                            }
-                        } catch {
-                            isValid = false;
-                            message = 'Please provide a valid URL';
-                        }
-                    }
-                    break;
-
-                case 'listing[price]':
-                    if (!value) {
-                        isValid = false;
-                        message = 'Price is required';
-                    } else if (isNaN(value) || parseFloat(value) <= 0) {
-                        isValid = false;
-                        message = 'Please enter a valid price greater than 0';
-                    } else if (parseFloat(value) > 100000) {
-                        isValid = false;
-                        message = 'Price seems too high. Please verify.';
-                    }
-                    break;
-
-                case 'listing[country]':
-                    if (!value) {
-                        isValid = false;
-                        message = 'Country is required';
-                    } else if (value.length < 2) {
-                        isValid = false;
-                        message = 'Country name must be at least 2 characters';
-                    }
-                    break;
-
-                case 'listing[location]':
-                    if (!value) {
-                        isValid = false;
-                        message = 'Location is required';
-                    } else if (value.length < 2) {
-                        isValid = false;
-                        message = 'Location must be at least 2 characters';
-                    }
-                    break;
-            }
-
-            if (isValid) {
-                field.classList.add('is-valid');
-            } else {
-                field.classList.add('is-invalid');
-                // Add error message
-                let errorDiv = field.parentNode.querySelector('.invalid-feedback');
-                if (!errorDiv) {
-                    errorDiv = document.createElement('div');
-                    errorDiv.className = 'invalid-feedback';
-                    field.parentNode.appendChild(errorDiv);
-                }
-                errorDiv.textContent = message;
-            }
-
-            return isValid;
-        }
-
-        // Character counter for description
-        const descriptionTextarea = document.getElementById('description');
-        const charCounter = document.createElement('small');
-        charCounter.className = 'text-muted mt-1 d-block';
-        descriptionTextarea.parentNode.appendChild(charCounter);
-
-        descriptionTextarea.addEventListener('input', function() {
-            const length = this.value.length;
-            charCounter.textContent = `${length}/1000 characters`;
-            if (length > 900) {
-                charCounter.className = 'text-warning mt-1 d-block';
-            } else if (length > 950) {
-                charCounter.className = 'text-danger mt-1 d-block';
-            } else {
-                charCounter.className = 'text-muted mt-1 d-block';
-            }
-        });
-
-        // Initialize character counter
-        descriptionTextarea.dispatchEvent(new Event('input'));
-
-        // Image URL preview (optional enhancement)
-        const imageInput = document.getElementById('image');
-        imageInput.addEventListener('blur', function() {
-            if (this.value && this.classList.contains('is-valid')) {
-                // Could add image preview functionality here
-                console.log('Valid image URL entered');
-            }
-        });
-
-        // Price formatting
-        const priceInput = document.getElementById('price');
-        priceInput.addEventListener('input', function() {
-            // Remove any non-numeric characters except decimal point
-            this.value = this.value.replace(/[^0-9.]/g, '');
-            // Ensure only one decimal point
-            const parts = this.value.split('.');
-            if (parts.length > 2) {
-                this.value = parts[0] + '.' + parts.slice(1).join('');
-            }
-        });
-
-        // Auto-capitalize country and location
-        const countryInput = document.getElementById('country');
-        const locationInput = document.getElementById('location');
-
-        [countryInput, locationInput].forEach(input => {
-            input.addEventListener('input', function() {
-                // Capitalize first letter of each word
-                this.value = this.value.replace(/\b\w/g, l => l.toUpperCase());
-            });
-        });
-
-        // Form field focus effects
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentNode.querySelector('.form-label').style.color = '#667eea';
-            });
-
-            input.addEventListener('blur', function() {
-                this.parentNode.querySelector('.form-label').style.color = '';
-            });
-        });
-    });
-    </script>
   </body>
 </html>
