@@ -1,4 +1,9 @@
 {
+
+  "engines":{
+    "node": "v25.5.0"
+
+  },
   "name": "wanderstay",
   "version": "1.0.0",
   "description": "A WanderStay clone for booking accommodations",

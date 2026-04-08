@@ -7,6 +7,7 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsLayouts = require("express-ejs-layouts");
 const session = require("express-session");
+const { MongoStore } = require('connect-mongo');
 const flash = require("connect-flash");
 const multer = require("multer");
 
@@ -14,7 +15,8 @@ const Listing = require("./Models/listing");
 const User = require("./Models/user");
 const asyncWrap = require("./public/utilities/asyncWrap");
 
-// ✅ CLOUDINARY
+
+// ================= DATABASE =================
 // const { storage } = require("./cloudConfig");
 // const upload = multer({ 
 //   storage,
@@ -59,11 +61,29 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve uploads
 
 // ================= SESSION =================
-app.use(session({
-  secret: process.env.SESSION_SECRET || "secret",
+// session  touch after
+
+const store = new MongoStore({
+  mongoUrl: MONGO_URL,
+  secret: process.env.SESSION_SECRET || "mysupersecretcode",
+  touchAfter: 24 * 60 * 60, // 24 hours
+});
+
+//session option
+const sessionOptions = {
+  secret: process.env.SESSION_SECRET || "mysecretcode",
   resave: false,
   saveUninitialized: true,
-}));
+  store,
+  cookie: {
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1 week
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    httpOnly: true,
+    // secure:true, // Uncomment if using HTTPS
+  },
+};
+
+app.use(session(sessionOptions));
 
 app.use(flash());
 
@@ -74,15 +94,15 @@ app.use((req, res, next) => {
   res.locals.error = req.flash("error");
 
   // For your new.ejs (if using successMessage)
-  res.locals.successMessage = res.locals.success;
-  res.locals.errorMessage = res.locals.error;
+  res.locals.successMessage = res.locals.success.join(' ');
+  res.locals.errorMessage = res.locals.error.join(' ');
 
   // Auth
   res.locals.currentUser = req.session.userId;
 
   next();
 });
-// session  touch after
+
 // ================= AUTH MIDDLEWARE =================
 const isLoggedIn = (req, res, next) => {
   if (!req.session.userId) {
