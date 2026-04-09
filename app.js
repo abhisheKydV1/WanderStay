@@ -17,29 +17,29 @@ const asyncWrap = require("./public/utilities/asyncWrap");
 
 
 // ================= DATABASE =================
-// const { storage } = require("./cloudConfig");
-// const upload = multer({ 
-//   storage,
-//   limits: {
-//     fileSize: 5 * 1024 * 1024, // 5MB limit
-//   }
-// });
-
-// Temporary local storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
+const { storage } = require("./cloudConfig");
 const upload = multer({ 
   storage,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
   }
 });
+
+// // Temporary local storage
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, 'uploads/');
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, Date.now() + '-' + file.originalname);
+//   }
+// });
+// const upload = multer({ 
+//   storage,
+//   limits: {
+//     fileSize: 5 * 1024 * 1024, // 5MB limit
+//   }
+// });
 
 // ================= DATABASE =================
 const MONGO_URL = process.env.atlas_db_url || process.env.MONGO_URL;
