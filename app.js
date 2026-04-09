@@ -42,7 +42,9 @@ const upload = multer({
 });
 
 // ================= DATABASE =================
-const MONGO_URL = process.env.atlas_db_url;
+const MONGO_URL = process.env.atlas_db_url || process.env.MONGO_URL;
+
+console.log("Mongo URL:", MONGO_URL); // debug
 
 mongoose.connect(MONGO_URL)
   .then(() => console.log("Connected to DB"))
